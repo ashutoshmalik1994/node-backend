@@ -1,0 +1,32 @@
+{
+  "name": "jupita-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jupita",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "async": "^3.2.0",
+    "bcrypt-nodejs": "0.0.3",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "forms": "^1.3.2",
+    "lodash": "^4.17.20",
+    "moment": "^2.29.0",
+    "mongodb-uri": "^0.9.7",
+    "mongoose": "^5.10.6",
+    "node-oauth2-server": "^2.4.0",
+    "nodemailer": "^6.4.14",
+    "oauth2orize": "^1.11.0",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "request": "^2.88.2"
+  }
+}
