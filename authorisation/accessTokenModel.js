@@ -55,6 +55,10 @@ function getUser(username, password, callback){
         console.log(username, password)
         userDBHelper.findOne({ 'email': username }, (err, user) => {
             if(err) return callback(err, null);
+            console.log(user);
+            if(user == null){
+                return callback('Invalid Credentials!')
+            }
             if (user.validPassword(password)) {
                 return callback(false, user);
             } else {
