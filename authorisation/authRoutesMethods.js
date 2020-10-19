@@ -10,12 +10,13 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
 const transporter = nodemailer.createTransport({
+    service: 'gmail',
     host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    port: 465,
+    secure: true,
     auth: {
-      user: 'ashutoshmalik.am@gmail.com',
-      pass: '8950603035'
+        user: 'ashutoshmalik.am@gmail.com',
+        pass: '8950603035'
     }
 });
 /************** User Registration API Start *************/
