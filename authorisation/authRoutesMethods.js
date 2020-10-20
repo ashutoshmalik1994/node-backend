@@ -52,7 +52,7 @@ exports.registerUser = (req, res) => {
                     from: 'noreply@jupita.io',
                     subject: 'Verify your email address',
                     text: 'and easy to do anywhere, even with Node.js',
-                    html: '<h1>Welcome</h1><p>Please verify your email address by clicking on this link http://localhost:4200/confirmation/'+data.token+'</p>',
+                    html: '<h1>Welcome</h1><p>Please verify your email address by clicking on this link http://3.129.207.232/confirmation/'+data.token+'</p>',
                 };
                 sgMail
                 .send(msg, (err, info) => {
