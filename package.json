@@ -12,6 +12,7 @@
     "nodemon": "^2.0.4"
   },
   "dependencies": {
+    "@sendgrid/mail": "^7.3.0",
     "async": "^3.2.0",
     "bcrypt-nodejs": "0.0.3",
     "cookie-parser": "^1.4.5",

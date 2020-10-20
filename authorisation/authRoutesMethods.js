@@ -8,6 +8,8 @@ const bcrypt = require('bcrypt-nodejs');
 const request = require('request');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey("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");
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -45,13 +47,15 @@ exports.registerUser = (req, res) => {
             models.VerifyEmail.create({ userId: saveData._id, token: crypto.randomBytes(16).toString('hex') }, (err, data) => {
                 console.log(data);
                 if(err) cb(err);
-                const mailOptions = {
-                    from: 'ashutoshmalik.am@gmail.com',
+                const msg = {
                     to: req.body.email,
+                    from: 'noreply@jupita.io',
                     subject: 'Verify your email address',
-                    html: '<h1>Welcome</h1><p>Please verify your email address by clicking on this link http://localhost:4200/confirmation/'+data.token+'</p>'
+                    text: 'and easy to do anywhere, even with Node.js',
+                    html: '<h1>Welcome</h1><p>Please verify your email address by clicking on this link http://localhost:4200/confirmation/'+data.token+'</p>',
                 };
-                transporter.sendMail(mailOptions, function(err, info){
+                sgMail
+                .send(msg, (err, info) => {
                     (err) ? cb(err) : cb(null, saveData);
                 });
             });
