@@ -52,7 +52,7 @@ exports.registerUser = (req, res) => {
                     from: 'support@jupita.io',
                     subject: 'Verify your email address',
                     text: 'and easy to do anywhere, even with Node.js',
-                    html: '<h1>Welcome</h1><p>Please verify your email address by clicking on this link http://localhost:4200/confirmation/'+data.token+'</p>',
+                    html: '<h1>Welcome</h1><p>Please verify your email address by clicking on this link http://3.129.207.232/confirmation/'+data.token+'</p>',
                 };
                 sgMail
                 .send(msg, (err, info) => {
@@ -125,7 +125,7 @@ exports.resendEmailVerification = (req, res) => {
                     from: 'support@jupita.io',
                     subject: 'Verify your email address',
                     text: 'and easy to do anywhere, even with Node.js',
-                    html: '<h1>Welcome</h1><p>Please verify your email address by clicking on this link http://localhost:4200/confirmation/'+data.token+'</p>',
+                    html: '<h1>Welcome</h1><p>Please verify your email address by clicking on this link http://3.129.207.232/confirmation/'+data.token+'</p>',
                 };
                 sgMail
                 .send(msg, (err, info) => {
@@ -172,7 +172,7 @@ exports.sendForgotPasswordLink = (req, res) => {
                     from: 'support@jupita.io',
                     subject: 'Forgot Password Link',
                     text: 'and easy to do anywhere, even with Node.js',
-                    html: '<h1>Welcome</h1><p>Please click on provided link for setup password http://localhost:4200/reset-password/'+data.token+'</p>',
+                    html: '<h1>Welcome</h1><p>Please click on provided link for setup password http://3.129.207.232/reset-password/'+data.token+'</p>',
                 };
                 sgMail
                 .send(msg, (err, info) => {
