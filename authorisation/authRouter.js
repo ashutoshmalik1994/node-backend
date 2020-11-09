@@ -4,6 +4,9 @@ module.exports.configure = (app) => {
     /* This is the route client's will call to register new users. It's very aptly named. */
     app.post('/auth/registerUser', authRoutesMethods.registerUser);
     app.post('/auth/verifyEmail', authRoutesMethods.verifyEmail);
+    app.post('/auth/resendEmailVerification', authRoutesMethods.resendEmailVerification);
+    app.post('/auth/sendForgotPasswordLink', authRoutesMethods.sendForgotPasswordLink);
+    app.post('/auth/resetPassword', authRoutesMethods.resetPassword);
     app.post('/auth/checkAuthorisation', app.oauth.authorise(), authRoutesMethods.checkAuthorisation);
     app.post('/auth/register-product', app.oauth.authorise(), authRoutesMethods.registerProduct);
     app.post('/auth/refresh-product-token', app.oauth.authorise(), authRoutesMethods.refreshProductToken);

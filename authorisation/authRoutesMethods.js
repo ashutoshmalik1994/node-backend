@@ -49,10 +49,10 @@ exports.registerUser = (req, res) => {
                 if(err) cb(err);
                 const msg = {
                     to: req.body.email,
-                    from: 'noreply@jupita.io',
+                    from: 'support@jupita.io',
                     subject: 'Verify your email address',
                     text: 'and easy to do anywhere, even with Node.js',
-                    html: '<h1>Welcome</h1><p>Please verify your email address by clicking on this link http://3.129.207.232/confirmation/'+data.token+'</p>',
+                    html: '<h1>Welcome</h1><p>Please verify your email address by clicking on this link http://localhost:4200/confirmation/'+data.token+'</p>',
                 };
                 sgMail
                 .send(msg, (err, info) => {
@@ -71,14 +71,16 @@ exports.verifyEmail = (req, res) => {
         (cb) => {
             models.VerifyEmail.findOne({token: req.body.id}, (err, data) => {
                 if(err) cb(err);
+                console.log(data);
                 if(data == null) {
                     cb('This link is not exist');
                 } else {
                     models.User.findOneAndUpdate({_id: data.userId}, {status: true}, (err, userData) => {
+                        console.log(userData);
                         if(err) cb(err);
-                        models.VerifyEmail.findOneAndDelete({_id: data._id}, (err, deleted) => {
+                        models.VerifyEmail.findOneAndDelete({_id: userData._id}, (err, deleted) => {
                             if(err) cb(err);
-                            cb(null, 'success');
+                            cb(null, userData);
                         })
                     });
                 }
@@ -90,6 +92,130 @@ exports.verifyEmail = (req, res) => {
     });
 }
 
+exports.resendEmailVerification = (req, res) => {
+    console.log(req.body);
+    async.waterfall([
+        (cb) => {
+            models.User.findOne({email: req.body.actualEmail}, (err, previousData) => {
+                if(err) cb(err);
+                console.log(previousData)
+                if(previousData != null){
+                    if(!previousData.status){
+                        models.User.findOneAndUpdate({email: req.body.actualEmail}, {email: req.body.newEmail}, (err, userData) => {
+                            if(err) cb(err);
+                            models.VerifyEmail.findOneAndDelete({userId: userData._id}, (err, data) => {
+                                if(err) cb(err);
+                                cb(null, userData);
+                            });
+                        });
+                    }else{
+                        cb("This email is already verified");
+                    }
+                }else{
+                    cb("User not found");
+                }
+            });
+        },
+        (userData, cb) => {
+            models.VerifyEmail.create({ userId: userData._id, token: crypto.randomBytes(16).toString('hex') }, (err, data) => {
+                console.log(data);
+                if(err) cb(err);
+                const msg = {
+                    to: req.body.newEmail,
+                    from: 'support@jupita.io',
+                    subject: 'Verify your email address',
+                    text: 'and easy to do anywhere, even with Node.js',
+                    html: '<h1>Welcome</h1><p>Please verify your email address by clicking on this link http://localhost:4200/confirmation/'+data.token+'</p>',
+                };
+                sgMail
+                .send(msg, (err, info) => {
+                    (err) ? cb(err) : cb(null, userData);
+                });
+            });
+        }
+    ], (error, data) => {
+        const response = response_helper(res);
+        return (error) ? response.failure(error, 409) : response.data({ 'is_success': true, 'data': data }, 200);
+    });
+}
+
+exports.sendForgotPasswordLink = (req, res) => {
+    async.waterfall([
+        (cb) => {
+            models.User.findOne({email: req.body.email}, (err, userData) => {
+                if(err) cb(err);
+                if(userData != null){
+                    cb(null, userData)
+                }else{
+                    cb("User not found");
+                }
+            });
+        },
+        (userData, cb) => {
+            models.ForgotPassword.findOne({ userId: userData._id }, (err, previousLink) => {
+                if(err) cb(err);
+                if(previousLink != null) {
+                    models.ForgotPassword.findOneAndDelete({ _id: previousLink._id}, (err, deleted) => {
+                        if(err) cb(err);
+                        cb(null, userData);
+                    });
+                } else {
+                    cb(null, userData)
+                }
+            });
+        },
+        (userData, cb) => {
+            models.ForgotPassword.create({ userId: userData._id, token: crypto.randomBytes(16).toString('hex') }, (err, data) => {
+                if(err) cb(err);
+                const msg = {
+                    to: req.body.email,
+                    from: 'support@jupita.io',
+                    subject: 'Forgot Password Link',
+                    text: 'and easy to do anywhere, even with Node.js',
+                    html: '<h1>Welcome</h1><p>Please click on provided link for setup password http://localhost:4200/reset-password/'+data.token+'</p>',
+                };
+                sgMail
+                .send(msg, (err, info) => {
+                    (err) ? cb(err) : cb(null, userData);
+                });
+            });
+        }
+    ], (error, data) => {
+        const response = response_helper(res);
+        return (error) ? response.failure(error, 409) : response.data({ 'is_success': true, 'data': data }, 200);
+    });
+}
+
+exports.resetPassword = (req, res) => {
+    async.waterfall([
+        (cb) => {
+            models.ForgotPassword.findOne({token: req.body.token}, (err, forgotPasswordData) => {
+                if(err) cb(err);
+                if(forgotPasswordData != null){
+                    cb(null, forgotPasswordData)
+                }else{
+                    cb("This link is expired");
+                }
+            });
+        },
+        (data, cb) => {
+            const password = bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(8), null);
+            models.User.findOneAndUpdate({_id: data.userId}, {password: password}, (err, userData) => {
+                if(err) cb(err);
+                cb(null, userData);
+            })
+        },
+        (deleteEntry, cb) => {
+            models.ForgotPassword.findOneAndDelete({userId: deleteEntry._id}, (err, data) => {
+                if(err) cb(err);
+                cb(null, "password reset successfully");
+            })
+        }
+    ], (error, data) => {
+        const response = response_helper(res);
+        return (error) ? response.failure(error, 409) : response.data({ 'is_success': true, 'data': data }, 200);
+    });
+}
 /************** User Registration API End *************/
 
 exports.checkAuthorisation = (req, res) => {
